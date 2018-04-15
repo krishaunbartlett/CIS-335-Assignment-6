@@ -16,21 +16,18 @@ import parse.SicLine;
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO: Remove overridden input file
-		args = new String[] { "Assembler",
-				"C:\\Users\\nprin\\java-workspace\\Assignment 6\\src\\main.asm" };
 
 		final Map<String, InstructionInfo> optab = parseOptab();
 
 		// read file
 		if (args.length < 1)
-			throw new IllegalArgumentException("Not enough arguments given");
-		String filename = args[1];
+			throw new IllegalArgumentException("Please provide filepath in args");
+		String filename = args[0];
 		Path filepath = Paths.get(filename);
 		if (Files.notExists(filepath))
 			throw new IllegalArgumentException("File does not exist");
-		String objFileName = filename.replace(".asm", ".obj"),
-				lstFileName = filename.replace(".asm", ".lst");
+		String objFileName = filename.replace(".asm", ".obj");
+		String lstFileName = filename.replace(".asm", ".lst");
 		try {
 			List<String> lines = Files.readAllLines(filepath);
 			// parses lines, stores in parsedLines
@@ -92,8 +89,7 @@ public class Main {
 		// OPNAME, OPCODE, FORMAT, OPCOUNT
 		try {
 			return Collections.unmodifiableMap(Files
-					.lines(Paths
-							.get("C:\\Users\\nprin\\java-workspace\\Assignment 6\\src\\optab.txt"))
+					.lines(Paths.get(".\\src\\optab.txt").toAbsolutePath().normalize())
 					.filter(l -> !l.isEmpty()).filter(l -> !l.startsWith("//"))
 					.map(l -> l.split(","))
 					.map(arr -> Arrays.stream(arr).map(String::trim).toArray(String[]::new))

@@ -22,9 +22,9 @@ public class Assembler {
 		int startAddr = 0;
 		List<String> intermediate = new ArrayList<>();
 		int locctr = startAddr;
-		for (String line : lines) {
-			// skip empty lines or comment lines
-			if (line.isEmpty() || line.matches("^\\w+\\..+$"))
+		lineIterLoop: for (String line : lines) {
+			// skip empty lines, whitespace lines and comment lines
+			if (line.trim().isEmpty() || line.matches("^\\w+\\..+$"))
 				continue;
 			SicLine parsedLine = SicLine.parseLine(line, locctr);
 			parsedLines.add(parsedLine);
@@ -39,12 +39,6 @@ public class Assembler {
 				else
 					symtab.put(label, locctr);
 
-			// pass 1 finished when END is read
-			if (instruction.equals("END")) {
-				intermediate.add(String.format("%06X\t%s", lineLoc, line));
-				break;
-			}
-
 			switch (instruction.toUpperCase()) {
 			case "BASE":
 				break;
@@ -54,6 +48,10 @@ public class Assembler {
 				programName = parsedLine.getLabel();
 				startAddr = Integer.parseInt(parsedLine.getOperands()[0]);
 				break;
+			case "END":
+				// pass 1 finished when END is read
+				intermediate.add(String.format("%06X\t%s", lineLoc, line));
+				break lineIterLoop;
 			case "RESW":
 				// If RESW, add 3 * operand to LOCCTR
 				locctr += 3 * Integer.parseInt(parsedLine.getOperands()[0]);
